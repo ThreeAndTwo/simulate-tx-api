@@ -1,0 +1,5 @@
+.idea
+.DS_Store
+conf/config.yaml
+conf/job.json
+/logs
