@@ -25,7 +25,7 @@ type TenderlySimulateRes struct {
 	Transaction         TenderlySimulateTransaction `json:"transaction"`
 	Simulation          TenderlySimulationRes       `json:"simulation"`
 	Contracts           []string                    `json:"contracts"`
-	GeneratedAccessList []string                    `json:"generated_access_list"`
+	GeneratedAccessList []interface{}               `json:"generated_access_list"`
 }
 
 type TenderlySimulateTransaction struct {
