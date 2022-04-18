@@ -16,15 +16,17 @@ type Net struct {
 type NetType string
 
 const (
-	GetType  NetType = "get"
-	PostType NetType = "post"
+	GetTy    NetType = "get"
+	PostTy   NetType = "post"
+	DeleteTy NetType = "delete"
+	PutTy    NetType = "put"
 )
 
 func NewNet(url string, header map[string]string, params map[string]interface{}) *Net {
 	return &Net{Url: url, Header: header, Params: params}
 }
 
-func (n *Net) Request() (string, error) {
+func (n *Net) Request(netType NetType) (string, error) {
 	reqHeader, hasJson := n.initHeader()
 	reqParams := n.initParam()
 
@@ -32,16 +34,15 @@ func (n *Net) Request() (string, error) {
 		n.IsJson = hasJson
 	}
 
-	netType := GetType
-	if len(n.Params) != 0 {
-		netType = PostType
-	}
-
 	switch netType {
-	case GetType:
+	case GetTy:
 		return n.get(reqHeader)
-	case PostType:
+	case PostTy:
 		return n.post(reqHeader, reqParams)
+	case DeleteTy:
+		return n.delete(reqHeader)
+	case PutTy:
+		return n.put(reqHeader, reqParams)
 	default:
 		return n.get(reqHeader)
 	}
@@ -72,6 +73,24 @@ func (n *Net) post(header req.Header, param req.Param) (string, error) {
 		reqResp, err = req.Post(n.Url, header, jsonParam)
 	} else {
 		reqResp, err = req.Post(n.Url, header, param)
+	}
+	return reqResp.String(), err
+}
+
+func (n *Net) delete(header req.Header) (string, error) {
+	reqResp, err := req.Delete(n.Url, header)
+	return reqResp.String(), err
+}
+
+func (n *Net) put(header req.Header, param req.Param) (string, error) {
+	var reqResp = &req.Resp{}
+	var err error
+
+	if n.IsJson {
+		jsonParam, _ := json.Marshal(param)
+		reqResp, err = req.Put(n.Url, header, jsonParam)
+	} else {
+		reqResp, err = req.Put(n.Url, header, param)
 	}
 	return reqResp.String(), err
 }

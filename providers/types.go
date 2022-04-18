@@ -147,3 +147,132 @@ type TenderlySimulationRes struct {
 	QueueOrigin      string        `json:"queue_origin"`
 	CreatedAt        time.Time     `json:"created_at"`
 }
+
+type AddForEnv struct {
+	NetworkId   string `json:"network_id"`
+	Alias       string `json:"alias"`
+	Description string `json:"description"`
+}
+
+type RenameForEnv struct {
+	NetworkId   string `json:"network_id"`
+	BlockNumber int    `json:"block_number"`
+	Alias       string `json:"alias"`
+	Description string `json:"description"`
+}
+
+type AddEnvResult struct {
+	SimulationFork  *TenderlySimulationFork `json:"simulation_fork"`
+	RootTransaction struct {
+		Id           string `json:"id"`
+		ProjectId    string `json:"project_id"`
+		ForkId       string `json:"fork_id"`
+		Alias        string `json:"alias"`
+		Description  string `json:"description"`
+		Internal     bool   `json:"internal"`
+		Hash         string `json:"hash"`
+		StateObjects []struct {
+			Address string `json:"address"`
+			Data    struct {
+				Balance string `json:"balance"`
+			} `json:"data"`
+		} `json:"state_objects"`
+		NetworkId        string `json:"network_id"`
+		BlockNumber      int    `json:"block_number"`
+		TransactionIndex int    `json:"transaction_index"`
+		From             string `json:"from"`
+		To               string `json:"to"`
+		Input            string `json:"input"`
+		Gas              int    `json:"gas"`
+		L1MessageSender  string `json:"l1_message_sender"`
+		L1BlockNumber    int    `json:"l1_block_number"`
+		L1Timestamp      int    `json:"l1_timestamp"`
+		GasPrice         string `json:"gas_price"`
+		Value            string `json:"value"`
+		Status           bool   `json:"status"`
+		ForkHeight       int    `json:"fork_height"`
+		BlockHash        string `json:"block_hash"`
+		Nonce            int    `json:"nonce"`
+		Receipt          struct {
+			TransactionHash   string        `json:"transactionHash"`
+			TransactionIndex  string        `json:"transactionIndex"`
+			BlockHash         string        `json:"blockHash"`
+			BlockNumber       string        `json:"blockNumber"`
+			From              string        `json:"from"`
+			To                string        `json:"to"`
+			CumulativeGasUsed string        `json:"cumulativeGasUsed"`
+			GasUsed           string        `json:"gasUsed"`
+			EffectiveGasPrice string        `json:"effectiveGasPrice"`
+			ContractAddress   interface{}   `json:"contractAddress"`
+			Logs              []interface{} `json:"logs"`
+			LogsBloom         string        `json:"logsBloom"`
+			Status            string        `json:"status"`
+			Type              string        `json:"type"`
+		} `json:"receipt"`
+		AccessList  interface{} `json:"access_list"`
+		BlockHeader struct {
+			Number           string      `json:"number"`
+			Hash             string      `json:"hash"`
+			StateRoot        string      `json:"stateRoot"`
+			ParentHash       string      `json:"parentHash"`
+			Sha3Uncles       string      `json:"sha3Uncles"`
+			TransactionsRoot string      `json:"transactionsRoot"`
+			ReceiptsRoot     string      `json:"receiptsRoot"`
+			LogsBloom        string      `json:"logsBloom"`
+			Timestamp        string      `json:"timestamp"`
+			Difficulty       string      `json:"difficulty"`
+			GasLimit         string      `json:"gasLimit"`
+			GasUsed          string      `json:"gasUsed"`
+			Miner            string      `json:"miner"`
+			ExtraData        string      `json:"extraData"`
+			MixHash          string      `json:"mixHash"`
+			Nonce            string      `json:"nonce"`
+			BaseFeePerGas    string      `json:"baseFeePerGas"`
+			Transactions     interface{} `json:"transactions"`
+			Uncles           interface{} `json:"uncles"`
+		} `json:"block_header"`
+		ParentId   string    `json:"parent_id"`
+		CreatedAt  time.Time `json:"created_at"`
+		Timestamp  time.Time `json:"timestamp"`
+		BranchRoot bool      `json:"branch_root"`
+	} `json:"root_transaction"`
+}
+
+type TenderlySimulationFork struct {
+	Id               string            `json:"id"`
+	ProjectId        string            `json:"project_id"`
+	Alias            string            `json:"alias"`
+	NetworkId        string            `json:"network_id"`
+	BlockNumber      int               `json:"block_number"`
+	TransactionIndex int               `json:"transaction_index"`
+	ChainConfig      TenderlyChainConf `json:"chain_config"`
+	CreatedAt        time.Time         `json:"created_at"`
+	Accounts         interface{}       `json:"accounts"`
+}
+
+type TenderlyChainConf struct {
+	Type                string      `json:"type"`
+	ChainId             int64       `json:"chain_id"`
+	HomesteadBlock      *big.Int    `json:"homestead_block"`
+	DaoForkBlock        *big.Int    `json:"dao_fork_block"`
+	Eip150Block         *big.Int    `json:"eip_150_Block"`
+	Eip150Hash          string      `json:"eip_150_Hash"`
+	Eip155Block         *big.Int    `json:"eip_155_block"`
+	Eip158Block         *big.Int    `json:"eip_158_block"`
+	ByzantiumBlock      *big.Int    `json:"byzantium_block"`
+	ConstantinopleBlock *big.Int    `json:"constantinople_block"`
+	PetersburgBlock     *big.Int    `json:"petersburg_block"`
+	IstanbulBlock       *big.Int    `json:"istanbul_block"`
+	MuirGlacierBlock    *big.Int    `json:"muir_glacier_block"`
+	BerlinBlock         *big.Int    `json:"berlin_block"`
+	LondonBlock         *big.Int    `json:"london_block"`
+	Ethash              interface{} `json:"ethash"`
+}
+
+type SimulationErrorResultForFork struct {
+	Error struct {
+		Message string      `json:"message"`
+		Slug    string      `json:"slug"`
+		Data    interface{} `json:"data"`
+	} `json:"error"`
+}
