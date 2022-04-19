@@ -3,9 +3,11 @@ package simulate_tx_api
 import "github.com/ThreeAndTwo/simulate-tx-api/providers"
 
 type ISimulate interface {
-	AddForkEnv(chainId, name string) error
-	RenameForkEnv(forkId, chainId, name string) error
-	DeleteForkEnv(forkId string) error
+	AddProject(name string) (string, error)
+	RenameProject(name string) (string, error)
+	AddForkEnv(chainId, name string) (string, error)
+	RenameForkEnv(forkId, chainId, name string) (string, error)
+	DeleteForkEnv(forkId string) (string, error)
 	SimulateTxForFork(forkId, params string) (string, error)
 	Simulate(params string) (string, error)
 }
@@ -31,10 +33,10 @@ func NewSimulate(account, project, token string, tps int) *Simulate {
 func (s *Simulate) SimulateGetter(platform Platform) ISimulate {
 	switch platform {
 	case SimulateTenderly:
-		return providers.NewTenderSimulate(s.Account, s.Project, s.Token, s.Tps)
+		return providers.NewTenderly(s.Account, s.Project, s.Token, s.Tps)
 	case SimulateBlockNative:
 		return nil
 	default:
-		return providers.NewTenderSimulate(s.Account, s.Project, s.Token, s.Tps)
+		return providers.NewTenderly(s.Account, s.Project, s.Token, s.Tps)
 	}
 }

@@ -5,6 +5,33 @@ import (
 	"time"
 )
 
+type TenderlyAddProjectResult struct {
+	Project TenderlyProject `json:"project"`
+}
+
+type TenderlyProject struct {
+	Id            string      `json:"id"`
+	Name          string      `json:"name"`
+	Slug          string      `json:"slug"`
+	OwnerId       string      `json:"owner_id"`
+	Public        bool        `json:"public"`
+	HighVolume    bool        `json:"high_volume"`
+	InTransfer    bool        `json:"in_transfer"`
+	IsModule      bool        `json:"is_module"`
+	CreatedAt     time.Time   `json:"created_at"`
+	LastPushAt    interface{} `json:"last_push_at"`
+	NumberOfUsers int         `json:"number_of_users"`
+	Options       interface{} `json:"options"`
+	Owner         struct {
+		Id        string `json:"id"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
+		Username  string `json:"username"`
+		Email     string `json:"email"`
+		Type      string `json:"type"`
+	} `json:"owner"`
+}
+
 type TenderlySimulate struct {
 	NetworkId          string        `json:"network_id"`
 	BlockNumber        uint64        `json:"block_number"`

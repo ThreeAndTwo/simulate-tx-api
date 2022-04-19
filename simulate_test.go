@@ -9,7 +9,9 @@ import (
 type actionTy int
 
 const (
-	actionSimulate actionTy = iota
+	actionAddProject actionTy = iota
+	actionRenameProject
+	actionSimulate
 	actionAddEnv
 	actionRenameEnv
 	actionDeleteEnv
@@ -29,62 +31,88 @@ type testSimulate struct {
 func TestTenderly(t *testing.T) {
 	tests := []testSimulate{
 		{
+			name:    "add project on tenderly",
+			action:  actionAddProject,
+			account: os.Getenv("ACCOUNT"),
+			token:   os.Getenv("TOKEN"),
+			project: "project",
+			tps:     1,
+			params:  "",
+		},
+		{
+			name:    "rename project on tenderly",
+			action:  actionRenameProject,
+			account: os.Getenv("ACCOUNT"),
+			token:   os.Getenv("TOKEN"),
+			project: "project",
+			tps:     1,
+			params:  "",
+		},
+		{
 			name:    "simulate failed for tenderly",
 			action:  actionSimulate,
-			account: os.Getenv("account"),
-			token:   os.Getenv("token"),
-			project: "test_fork",
+			account: os.Getenv("ACCOUNT"),
+			token:   os.Getenv("TOKEN"),
+			project: "aaa-bbb",
 			tps:     1,
 			params:  `{"network_id":"1","block_number":14365389,"transaction_index":0,"from":"0x7da5eacc8628f22d5e56ed0018751a8921942e38","input":"0xf8ca0f85174876e80083030d40947cad06b811b5d9d3ff197c1a046abcbc0efbcbc980b864d675fd260000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000c626a0189c5d42fea496685df9488e8c2b761a278a7a6744383a9a6d7927dc11f70c29a02a948c7f03f80a30cf7fe5262c0f95068fa2c111b655d6a73cc223b151b6c0dc","to":"0x7cad06b811b5d9d3ff197c1a046abcbc0efbcbc9","gas":200000,"gas_price":"100000000000","value":"0","access_list":[],"generate_access_list":true,"save":false,"source":"dashboard"}`,
 		},
 		{
 			name:    "simulate success for tenderly",
 			action:  actionSimulate,
-			account: os.Getenv("account"),
-			token:   os.Getenv("token"),
-			project: "test_fork",
+			account: os.Getenv("ACCOUNT"),
+			token:   os.Getenv("TOKEN"),
+			project: "aaa-bbb",
 			tps:     1,
 			params:  `{"network_id":"1","block_number":14365440,"transaction_index":0,"from":"0x7da5eacc8628f22d5e56ed0018751a8921942e38","input":"0xd675fd260000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000c7","to":"0x7cad06b811b5d9d3ff197c1a046abcbc0efbcbc9","gas":200000,"gas_price":"100000000000","value":"0","access_list":[],"generate_access_list":true,"save":false,"source":"dashboard"}`,
 		},
 		{
 			name:    "params error",
 			action:  actionSimulate,
-			account: os.Getenv("account"),
-			token:   os.Getenv("token"),
-			project: "test_fork",
+			account: os.Getenv("ACCOUNT"),
+			token:   os.Getenv("TOKEN"),
+			project: "aaa-bbb",
 			tps:     0,
 			params:  "",
 		},
 		{
 			name:    "test add fork env",
 			action:  actionAddEnv,
-			account: os.Getenv("account"),
-			token:   os.Getenv("token"),
-			project: "test_fork",
+			account: os.Getenv("ACCOUNT"),
+			token:   os.Getenv("TOKEN"),
+			project: "aaa-bbb",
+			tps:     1,
+		},
+		{
+			name:    "test add fork env, project error",
+			action:  actionAddEnv,
+			account: os.Getenv("ACCOUNT"),
+			token:   os.Getenv("TOKEN"),
+			project: "test-fork",
 			tps:     1,
 		},
 		{
 			name:    "test rename fork env",
 			action:  actionRenameEnv,
-			account: os.Getenv("account"),
-			token:   os.Getenv("token"),
-			project: "test_fork",
+			account: os.Getenv("ACCOUNT"),
+			token:   os.Getenv("TOKEN"),
+			project: "aaa-bbb",
 			tps:     1,
 		},
 		{
 			name:    "test delete fork env",
 			action:  actionDeleteEnv,
-			account: os.Getenv("account"),
-			token:   os.Getenv("token"),
-			project: "test_fork",
+			account: os.Getenv("ACCOUNT"),
+			token:   os.Getenv("TOKEN"),
+			project: "aaa-bbb",
 			tps:     1,
 		},
 		{
 			name:    "test simulation fork env",
 			action:  actionForkSimulate,
-			account: os.Getenv("account"),
-			token:   os.Getenv("token"),
-			project: "test_fork",
+			account: os.Getenv("ACCOUNT"),
+			token:   os.Getenv("TOKEN"),
+			project: "aaa-bbb",
 			tps:     1,
 		},
 	}
@@ -93,6 +121,10 @@ func TestTenderly(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			simulator := NewSimulate(tt.account, tt.project, tt.token, tt.tps).SimulateGetter(SimulateTenderly)
 			switch tt.action {
+			case actionAddProject:
+				tt.testAddProject(simulator)
+			case actionRenameProject:
+				tt.testRenameProject(simulator)
 			case actionSimulate:
 				tt.testSimulate(simulator)
 			case actionAddEnv:
@@ -105,6 +137,56 @@ func TestTenderly(t *testing.T) {
 				tt.testForkSimulation(simulator)
 			}
 		})
+	}
+}
+
+func (ts *testSimulate) testAddProject(simulator ISimulate) {
+	tests := []struct {
+		name    string
+		proName string
+	}{
+		{
+			name:    "test add project",
+			proName: "test-project",
+		},
+		{
+			name:    "project name is null",
+			proName: "",
+		},
+	}
+
+	for _, tt := range tests {
+		res, err := simulator.AddProject(tt.proName)
+		if err != nil {
+			_ = fmt.Errorf("add env for %s error: %s \n", ts.name, err)
+			return
+		}
+		fmt.Printf("add env for %s, result: %s \n", ts.name, res)
+	}
+}
+
+func (ts *testSimulate) testRenameProject(simulator ISimulate) {
+	tests := []struct {
+		name    string
+		proName string
+	}{
+		{
+			name:    "test add project",
+			proName: "Project",
+		},
+		{
+			name:    "project name is null",
+			proName: "",
+		},
+	}
+
+	for _, tt := range tests {
+		res, err := simulator.RenameProject(tt.proName)
+		if err != nil {
+			_ = fmt.Errorf("add env for %s error: %s \n", ts.name, err)
+			return
+		}
+		fmt.Printf("add env for %s, result: %s \n", ts.name, res)
 	}
 }
 
@@ -146,12 +228,12 @@ func (ts *testSimulate) testAddEnv(simulator ISimulate) {
 	}
 
 	for _, tt := range tests {
-		err := simulator.AddForkEnv(tt.chainId, tt.envName)
+		res, err := simulator.AddForkEnv(tt.chainId, tt.envName)
 		if err != nil {
 			_ = fmt.Errorf("add env for %s error: %s \n", tt.name, err)
 			continue
 		}
-		fmt.Printf("add env for %s \n", tt.name)
+		fmt.Printf("add env for %s, result:%s \n", tt.name, res)
 	}
 }
 
@@ -164,15 +246,15 @@ func (ts *testSimulate) testRenameEnv(simulator ISimulate) {
 	}{
 		{
 			name:    "test ethereum mainnet",
-			forkId:  "",
+			forkId:  "5051ee85-1441-47ac-a213-f5054ddcba24",
 			chainId: "1",
-			envName: "aaa_ethereum",
+			envName: "ethereum",
 		},
 		{
 			name:    "test bsc mainnet",
-			forkId:  "",
+			forkId:  "b7078201-445b-4c09-b93b-d52f8066bb4f",
 			chainId: "56",
-			envName: "aaa_bsc",
+			envName: "bsc",
 		},
 		{
 			name:    "test wrong chainId",
@@ -182,19 +264,19 @@ func (ts *testSimulate) testRenameEnv(simulator ISimulate) {
 		},
 		{
 			name:    "one char for name",
-			forkId:  "",
+			forkId:  "c6788c5d-1e12-469b-b1a1-7ec8152a6ad0",
 			chainId: "1",
-			envName: "aaa_1_char",
+			envName: "1",
 		},
 	}
 
 	for _, tt := range tests {
-		err := simulator.RenameForkEnv(tt.forkId, tt.chainId, tt.envName)
+		res, err := simulator.RenameForkEnv(tt.forkId, tt.chainId, tt.envName)
 		if err != nil {
 			_ = fmt.Errorf("rename env for %s error: %s \n", tt.name, err)
 			continue
 		}
-		fmt.Printf("rename env for %s \n", tt.name)
+		fmt.Printf("rename env for %s, result: %s", tt.name, res)
 	}
 }
 
@@ -205,7 +287,7 @@ func (ts *testSimulate) testDeleteEnv(simulator ISimulate) {
 	}{
 		{
 			name:   "normal forkId",
-			forkId: "",
+			forkId: "c6788c5d-1e12-469b-b1a1-7ec8152a6ad0",
 		},
 		{
 			name:   "not exists forkId",
@@ -214,12 +296,12 @@ func (ts *testSimulate) testDeleteEnv(simulator ISimulate) {
 	}
 
 	for _, tt := range test {
-		err := simulator.DeleteForkEnv(tt.forkId)
+		res, err := simulator.DeleteForkEnv(tt.forkId)
 		if err != nil {
 			_ = fmt.Errorf("delete env for %s error: %s \n", tt.name, err)
 			continue
 		}
-		fmt.Printf("delete env for %s \n", tt.name)
+		fmt.Printf("delete env for %s, result: %s", tt.name, res)
 	}
 }
 
@@ -231,8 +313,8 @@ func (ts *testSimulate) testForkSimulation(simulator ISimulate) {
 	}{
 		{
 			name:   "normal",
-			forkId: "",
-			params: "",
+			forkId: "5051ee85-1441-47ac-a213-f5054ddcba24",
+			params: "{\"network_id\":\"1\",\"block_number\":14365440,\"transaction_index\":0,\"from\":\"0x7da5eacc8628f22d5e56ed0018751a8921942e38\",\"input\":\"0xd675fd260000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000c7\",\"to\":\"0x7cad06b811b5d9d3ff197c1a046abcbc0efbcbc9\",\"gas\":200000,\"gas_price\":\"100000000000\",\"value\":\"0\",\"access_list\":[],\"generate_access_list\":true,\"save\":true,\"source\":\"dashboard\"}",
 		},
 		{
 			name:   "failed",
@@ -242,7 +324,7 @@ func (ts *testSimulate) testForkSimulation(simulator ISimulate) {
 	}
 
 	for _, tt := range tests {
-		res, err := simulator.SimulateTxForFork(tt.forkId, tt.name)
+		res, err := simulator.SimulateTxForFork(tt.forkId, tt.params)
 		if err != nil {
 			_ = fmt.Errorf("fork simulation env for %s error: %s \n", tt.name, err)
 			continue
