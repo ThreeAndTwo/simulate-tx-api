@@ -9,6 +9,17 @@ type TenderlyAddProjectResult struct {
 	Project TenderlyProject `json:"project"`
 }
 
+type RpcParams struct {
+	Method string      `json:"method"`
+	Params interface{} `json:"params"`
+}
+
+type AddBalanceResult struct {
+	Jsonrpc string `json:"jsonrpc"`
+	Result  string `json:"result"`
+	Id      int    `json:"id"`
+}
+
 type TenderlyProject struct {
 	Id            string      `json:"id"`
 	Name          string      `json:"name"`

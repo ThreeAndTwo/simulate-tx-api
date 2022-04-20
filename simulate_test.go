@@ -2,6 +2,7 @@ package simulate_tx_api
 
 import (
 	"fmt"
+	"github.com/ThreeAndTwo/simulate-tx-api/providers"
 	"os"
 	"testing"
 )
@@ -16,6 +17,7 @@ const (
 	actionRenameEnv
 	actionDeleteEnv
 	actionForkSimulate
+	actionJsonRpc
 )
 
 type testSimulate struct {
@@ -115,6 +117,14 @@ func TestTenderly(t *testing.T) {
 			project: "aaa-bbb",
 			tps:     1,
 		},
+		{
+			name:    "test request json rpc",
+			action:  actionJsonRpc,
+			account: os.Getenv("ACCOUNT"),
+			token:   os.Getenv(""),
+			project: "",
+			tps:     1,
+		},
 	}
 
 	for _, tt := range tests {
@@ -135,8 +145,53 @@ func TestTenderly(t *testing.T) {
 				tt.testDeleteEnv(simulator)
 			case actionForkSimulate:
 				tt.testForkSimulation(simulator)
+			case actionJsonRpc:
+				tt.testReqJsonRpc(simulator)
 			}
 		})
+	}
+}
+
+func (ts *testSimulate) testReqJsonRpc(simulator ISimulate) {
+	var p1 []interface{}
+	account := []string{"0x8b4941915D7E2971E583976c66Da3a84A6E1936b"}
+	p1 = append(p1, account)
+	p1 = append(p1, "0x3e8")
+
+	var p2 []interface{}
+	p2 = append(p2, []string{})
+	p2 = append(p2, "")
+
+	var tests = []struct {
+		name   string
+		rpc    string
+		params *providers.RpcParams
+	}{
+		{
+			name: "normal",
+			rpc:  "https://rpc.tenderly.co/fork/" + os.Getenv("FORKID"),
+			params: &providers.RpcParams{
+				Method: "tenderly_addBalance",
+				Params: p1,
+			},
+		},
+		{
+			name: "account is null",
+			rpc:  "https://rpc.tenderly.co/fork/" + os.Getenv("FORKID"),
+			params: &providers.RpcParams{
+				Method: "tenderly_addBalance",
+				Params: p2,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		res, err := simulator.ReqJsonRpc(tt.rpc, tt.params)
+		if err != nil {
+			_ = fmt.Errorf("req json rpc for %s error: %s \n", ts.name, err)
+			return
+		}
+		fmt.Printf("req json rpc for %s, result: %s \n", ts.name, res)
 	}
 }
 

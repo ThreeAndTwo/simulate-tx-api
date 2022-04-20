@@ -10,6 +10,7 @@ type ISimulate interface {
 	DeleteForkEnv(forkId string) (string, error)
 	SimulateTxForFork(forkId, params string) (string, error)
 	Simulate(params string) (string, error)
+	ReqJsonRpc(rpc string, params *providers.RpcParams) (string, error)
 }
 
 type Simulate struct {

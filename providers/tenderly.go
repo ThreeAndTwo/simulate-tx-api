@@ -22,6 +22,31 @@ func NewTenderly(account, project, token string, tps int) *Tenderly {
 	return &Tenderly{URL: url, Project: project, Token: token, Limiter: rateLimiter}
 }
 
+func (t *Tenderly) ReqJsonRpc(rpc string, params *RpcParams) (string, error) {
+	_ = t.Limiter.Wait(context.Background())
+	//https://rpc.tenderly.co/fork/forkId
+
+	header := make(map[string]string)
+	header["Content-Type"] = "application/json"
+
+	bEnv, err := json.Marshal(params)
+	if err != nil {
+		return "", err
+	}
+
+	mapParam := make(map[string]interface{})
+	err = json.Unmarshal(bEnv, &mapParam)
+	if err != nil {
+		return "", err
+	}
+
+	res, err := NewNet(rpc, header, mapParam).Request(PostTy)
+	if err != nil {
+		return "", err
+	}
+	return res, nil
+}
+
 func (t *Tenderly) AddProject(name string) (string, error) {
 	// https://api.tenderly.co/api/v1/account/zck/project
 	_ = t.Limiter.Wait(context.Background())
