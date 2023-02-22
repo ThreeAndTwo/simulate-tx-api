@@ -22,12 +22,18 @@ func NewTenderly(account, project, token string, tps int) *Tenderly {
 	return &Tenderly{URL: url, Project: project, Token: token, Limiter: rateLimiter}
 }
 
+func (t *Tenderly) getReqHeader() (header map[string]string) {
+	header = make(map[string]string)
+	header["X-Access-Key"] = t.Token
+	header["Content-Type"] = "application/json"
+	return
+}
+
+// ReqJsonRpc
+//https://rpc.tenderly.co/fork/forkId
 func (t *Tenderly) ReqJsonRpc(rpc string, params *RpcParams) (string, error) {
 	_ = t.Limiter.Wait(context.Background())
-	//https://rpc.tenderly.co/fork/forkId
-
-	header := make(map[string]string)
-	header["Content-Type"] = "application/json"
+	header := t.getReqHeader()
 
 	bEnv, err := json.Marshal(params)
 	if err != nil {
@@ -47,12 +53,11 @@ func (t *Tenderly) ReqJsonRpc(rpc string, params *RpcParams) (string, error) {
 	return res, nil
 }
 
+// AddProject
+// https://api.tenderly.co/api/v1/account/zck/project
 func (t *Tenderly) AddProject(name string) (string, error) {
-	// https://api.tenderly.co/api/v1/account/zck/project
 	_ = t.Limiter.Wait(context.Background())
-	header := make(map[string]string)
-	header["X-Access-Key"] = t.Token
-	header["Content-Type"] = "application/json"
+	header := t.getReqHeader()
 
 	project := &struct {
 		Name string
@@ -81,10 +86,7 @@ func (t *Tenderly) AddProject(name string) (string, error) {
 
 func (t *Tenderly) RenameProject(name string) (string, error) {
 	_ = t.Limiter.Wait(context.Background())
-	header := make(map[string]string)
-	header["X-Access-Key"] = t.Token
-	header["Content-Type"] = "application/json"
-
+	header := t.getReqHeader()
 	project := &struct {
 		Name string
 	}{
@@ -110,13 +112,11 @@ func (t *Tenderly) RenameProject(name string) (string, error) {
 	return res, nil
 }
 
+// AddForkEnv
+// https://api.tenderly.co/api/v1/account/zck/project/project/fork
 func (t *Tenderly) AddForkEnv(chainId, name string) (string, error) {
-	// https://api.tenderly.co/api/v1/account/zck/project/project/fork
 	_ = t.Limiter.Wait(context.Background())
-	header := make(map[string]string)
-	header["X-Access-Key"] = t.Token
-	header["Content-Type"] = "application/json"
-
+	header := t.getReqHeader()
 	env := &AddForEnv{
 		NetworkId: chainId,
 		Alias:     name,
@@ -141,12 +141,11 @@ func (t *Tenderly) AddForkEnv(chainId, name string) (string, error) {
 	return res, nil
 }
 
+// RenameForkEnv
+//https://api.tenderly.co/api/v1/account/zck/project/project/fork/8a5d135f-447b-4fa3-9ed2-bcb91498d39a
 func (t *Tenderly) RenameForkEnv(forkId, chainId, name string) (string, error) {
-	//https://api.tenderly.co/api/v1/account/zck/project/project/fork/8a5d135f-447b-4fa3-9ed2-bcb91498d39a
 	_ = t.Limiter.Wait(context.Background())
-	header := make(map[string]string)
-	header["X-Access-Key"] = t.Token
-	header["Content-Type"] = "application/json"
+	header := t.getReqHeader()
 
 	env := &AddForEnv{
 		NetworkId: chainId,
@@ -172,13 +171,11 @@ func (t *Tenderly) RenameForkEnv(forkId, chainId, name string) (string, error) {
 	return res, nil
 }
 
+// DeleteForkEnv
+//  https: //api.tenderly.co/api/v1/account/zck/project/project/fork/30c50584-b7a2-4819-998a-e9ef85749575
 func (t *Tenderly) DeleteForkEnv(id string) (string, error) {
-	//  https: //api.tenderly.co/api/v1/account/zck/project/project/fork/30c50584-b7a2-4819-998a-e9ef85749575
 	_ = t.Limiter.Wait(context.Background())
-	header := make(map[string]string)
-	header["X-Access-Key"] = t.Token
-	header["Content-Type"] = "application/json"
-
+	header := t.getReqHeader()
 	url := t.URL + "/" + t.Project + "/fork/" + id
 	res, err := NewNet(url, header, nil).Request(DeleteTy)
 	if err != nil {
@@ -187,12 +184,11 @@ func (t *Tenderly) DeleteForkEnv(id string) (string, error) {
 	return res, nil
 }
 
+// SimulateTxForFork
+//https: //api.tenderly.co/api/v1/account/zck/project/project/fork/8a5d135f-447b-4fa3-9ed2-bcb91498d39a/simulate
 func (t *Tenderly) SimulateTxForFork(forkId, params string) (string, error) {
-	//https: //api.tenderly.co/api/v1/account/zck/project/project/fork/8a5d135f-447b-4fa3-9ed2-bcb91498d39a/simulate
 	_ = t.Limiter.Wait(context.Background())
-	header := make(map[string]string)
-	header["X-Access-Key"] = t.Token
-	header["Content-Type"] = "application/json"
+	header := t.getReqHeader()
 
 	mapParam := make(map[string]interface{})
 	err := json.Unmarshal([]byte(params), &mapParam)
@@ -204,11 +200,11 @@ func (t *Tenderly) SimulateTxForFork(forkId, params string) (string, error) {
 	return NewNet(url, header, mapParam).Request(PostTy)
 }
 
-func (t *Tenderly) Simulate(params string) (string, error) {
+// Simulations
+// https://docs.tenderly.co/simulations-and-forks/simulation-api/advanced-simulation-api
+func (t *Tenderly) Simulations(params string) (string, error) {
 	_ = t.Limiter.Wait(context.Background())
-	header := make(map[string]string)
-	header["X-Access-Key"] = t.Token
-	header["Content-Type"] = "application/json"
+	header := t.getReqHeader()
 
 	mapParam := make(map[string]interface{})
 	err := json.Unmarshal([]byte(params), &mapParam)
@@ -217,5 +213,20 @@ func (t *Tenderly) Simulate(params string) (string, error) {
 	}
 
 	url := t.URL + "/" + t.Project + "/simulate"
+	return NewNet(url, header, mapParam).Request(PostTy)
+}
+
+// BundledSimulations
+// https://docs.tenderly.co/simulations-and-forks/simulation-api/bundled-simulations
+// 本质计算存储插槽，在请求参数中带入 state_objects 的对象，提交请求。
+func (t *Tenderly) BundledSimulations(params string) (string, error) {
+	_ = t.Limiter.Wait(context.Background())
+	header := t.getReqHeader()
+	mapParam := make(map[string]interface{})
+	err := json.Unmarshal([]byte(params), &mapParam)
+	if err != nil {
+		return "", err
+	}
+	url := t.URL + "/" + t.Project + "/simulate-bundle"
 	return NewNet(url, header, mapParam).Request(PostTy)
 }

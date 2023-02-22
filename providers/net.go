@@ -2,6 +2,7 @@ package providers
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/deng00/req"
 	"strings"
 )
@@ -61,6 +62,9 @@ func (n *Net) get(header req.Header) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	if resp.Response().StatusCode != 200 {
+		return "", fmt.Errorf("%s", resp.String())
+	}
 	return resp.String(), nil
 }
 
@@ -74,11 +78,18 @@ func (n *Net) post(header req.Header, param req.Param) (string, error) {
 	} else {
 		reqResp, err = req.Post(n.Url, header, param)
 	}
+
+	if reqResp.Response().StatusCode != 200 {
+		return "", fmt.Errorf("%s", reqResp.String())
+	}
 	return reqResp.String(), err
 }
 
 func (n *Net) delete(header req.Header) (string, error) {
 	reqResp, err := req.Delete(n.Url, header)
+	if reqResp.Response().StatusCode != 200 {
+		return "", fmt.Errorf("%s", reqResp.String())
+	}
 	return reqResp.String(), err
 }
 
@@ -91,6 +102,10 @@ func (n *Net) put(header req.Header, param req.Param) (string, error) {
 		reqResp, err = req.Put(n.Url, header, jsonParam)
 	} else {
 		reqResp, err = req.Put(n.Url, header, param)
+	}
+
+	if reqResp.Response().StatusCode != 200 {
+		return "", fmt.Errorf("%s", reqResp.String())
 	}
 	return reqResp.String(), err
 }

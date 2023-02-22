@@ -9,7 +9,8 @@ type ISimulate interface {
 	RenameForkEnv(forkId, chainId, name string) (string, error)
 	DeleteForkEnv(forkId string) (string, error)
 	SimulateTxForFork(forkId, params string) (string, error)
-	Simulate(params string) (string, error)
+	Simulations(params string) (string, error)
+	BundledSimulations(params string) (string, error)
 	ReqJsonRpc(rpc string, params *providers.RpcParams) (string, error)
 }
 
