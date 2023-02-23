@@ -43,20 +43,20 @@ type TenderlyProject struct {
 	} `json:"owner"`
 }
 
-type TenderlySimulate struct {
-	NetworkId          string        `json:"network_id"`
-	BlockNumber        uint64        `json:"block_number"`
-	TransactionIndex   int           `json:"transaction_index"`
-	From               string        `json:"from"`
-	Input              string        `json:"input"`
-	To                 string        `json:"to"`
-	Gas                uint64        `json:"gas"`
-	GasPrice           string        `json:"gas_price"`
-	Value              string        `json:"value"`
-	AccessList         []interface{} `json:"access_list"`
-	GenerateAccessList bool          `json:"generate_access_list"`
-	Save               bool          `json:"save"`
-	Source             string        `json:"source"`
+// TenderlySimulations for bundle simulations
+type TenderlySimulations struct {
+	Simulations []TenderlySimulation `json:"simulations"`
+}
+
+type TenderlySimulation struct {
+	NetworkId      string                 `json:"network_id"`
+	Save           bool                   `json:"save"`
+	SaveIfFails    bool                   `json:"save_if_fails"`
+	SimulationType string                 `json:"simulation_type"`
+	From           string                 `json:"from"`
+	To             string                 `json:"to"`
+	Input          string                 `json:"input"`
+	StateObjects   map[string]interface{} `json:"state_objects"`
 }
 
 type TenderlySimulateRes struct {
