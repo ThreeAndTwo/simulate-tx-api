@@ -66,6 +66,10 @@ type TenderlySimulateRes struct {
 	GeneratedAccessList []interface{}               `json:"generated_access_list"`
 }
 
+type TenderlyBundleSimulateRes struct {
+	SimulationResults []TenderlySimulateRes `json:"simulation_results"`
+}
+
 type TenderlySimulateTransaction struct {
 	Hash              string                  `json:"hash"`
 	BlockHash         string                  `json:"block_hash"`
