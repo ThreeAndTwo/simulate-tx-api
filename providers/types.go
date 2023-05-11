@@ -55,6 +55,9 @@ type TenderlySimulation struct {
 	SimulationType string                 `json:"simulation_type"`
 	From           string                 `json:"from"`
 	To             string                 `json:"to"`
+	Gas            int                    `json:"gas"`
+	GasPrice       int                    `json:"gas_price"`
+	Value          int                    `json:"value"`
 	Input          string                 `json:"input"`
 	StateObjects   map[string]interface{} `json:"state_objects"`
 }
