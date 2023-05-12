@@ -49,17 +49,19 @@ type TenderlySimulations struct {
 }
 
 type TenderlySimulation struct {
-	NetworkId      string                 `json:"network_id"`
-	Save           bool                   `json:"save"`
-	SaveIfFails    bool                   `json:"save_if_fails"`
-	SimulationType string                 `json:"simulation_type"`
-	From           string                 `json:"from"`
-	To             string                 `json:"to"`
-	Gas            int                    `json:"gas"`
-	GasPrice       int                    `json:"gas_price"`
-	Value          uint64                 `json:"value"`
-	Input          string                 `json:"input"`
-	StateObjects   map[string]interface{} `json:"state_objects"`
+	NetworkId        string                 `json:"network_id"`
+	Save             bool                   `json:"save"`
+	SaveIfFails      bool                   `json:"save_if_fails"`
+	SimulationType   string                 `json:"simulation_type"`
+	BlockNumber      uint64                 `json:"block_number"`
+	TransactionIndex uint64                 `json:"transaction_index"`
+	From             string                 `json:"from"`
+	To               string                 `json:"to"`
+	Gas              int                    `json:"gas"`
+	GasPrice         int                    `json:"gas_price"`
+	Value            uint64                 `json:"value"`
+	Input            string                 `json:"input"`
+	StateObjects     map[string]interface{} `json:"state_objects"`
 }
 
 type TenderlySimulateRes struct {
