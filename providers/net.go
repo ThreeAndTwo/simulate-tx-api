@@ -79,10 +79,14 @@ func (n *Net) post(header req.Header, param req.Param) (string, error) {
 		reqResp, err = req.Post(n.Url, header, param)
 	}
 
+	if err != nil {
+		return "", err
+	}
+
 	if reqResp.Response().StatusCode != 200 {
 		return "", fmt.Errorf("%s", reqResp.String())
 	}
-	return reqResp.String(), err
+	return reqResp.String(), nil
 }
 
 func (n *Net) delete(header req.Header) (string, error) {
