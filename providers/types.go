@@ -48,6 +48,27 @@ type TenderlySimulations struct {
 	Simulations []TenderlySimulation `json:"simulations"`
 }
 
+type CoinSummerSimulation struct {
+	ChainId     int    `json:"chainId"`
+	From        string `json:"from"`
+	To          string `json:"to"`
+	Data        string `json:"data"`
+	GasLimit    uint64 `json:"gasLimit"`
+	Value       string `json:"value"`
+	BlockNumber uint64 `json:"blockNumber"`
+}
+
+type CoinSummerSimulationRes struct {
+	SimulationId   int         `json:"simulationId"`
+	GasUsed        uint64      `json:"gasUsed"`
+	BlockNumber    uint64      `json:"blockNumber"`
+	Success        bool        `json:"success"`
+	Trace          interface{} `json:"trace"`
+	FormattedTrace interface{} `json:"formattedTrace"`
+	Logs           interface{} `json:"logs"`
+	ExitReason     string      `json:"exitReason"`
+}
+
 type TenderlySimulation struct {
 	NetworkId        string                 `json:"network_id"`
 	Save             bool                   `json:"save"`

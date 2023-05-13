@@ -15,6 +15,7 @@ type ISimulate interface {
 }
 
 type Simulate struct {
+	Host    string
 	Account string
 	Project string
 	Token   string
@@ -26,10 +27,11 @@ type Platform string
 const (
 	SimulateTenderly    Platform = "tenderly"
 	SimulateBlockNative Platform = "blocknative"
+	SimulateCoinSummer  Platform = "coinsummer"
 )
 
-func NewSimulate(account, project, token string, tps int) *Simulate {
-	return &Simulate{Account: account, Project: project, Token: token, Tps: tps}
+func NewSimulate(host, account, project, token string, tps int) *Simulate {
+	return &Simulate{Host: host, Account: account, Project: project, Token: token, Tps: tps}
 }
 
 func (s *Simulate) SimulateGetter(platform Platform) ISimulate {
@@ -38,6 +40,8 @@ func (s *Simulate) SimulateGetter(platform Platform) ISimulate {
 		return providers.NewTenderly(s.Account, s.Project, s.Token, s.Tps)
 	case SimulateBlockNative:
 		return nil
+	case SimulateCoinSummer:
+		return providers.NewPrivateTxSimulator(s.Host, s.Tps)
 	default:
 		return providers.NewTenderly(s.Account, s.Project, s.Token, s.Tps)
 	}

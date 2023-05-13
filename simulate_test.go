@@ -65,7 +65,7 @@ func TestBundledSimulations(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			simulator := NewSimulate(tt.account, tt.project, tt.token, tt.tps).SimulateGetter(SimulateTenderly)
+			simulator := NewSimulate("", tt.account, tt.project, tt.token, tt.tps).SimulateGetter(SimulateTenderly)
 			simulations, err := simulator.BundledSimulations(tt.params)
 			if err != nil {
 				t.Errorf("req bundled simulations error: %s", err)
@@ -185,7 +185,7 @@ func TestTenderly(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			simulator := NewSimulate(tt.account, tt.project, tt.token, tt.tps).SimulateGetter(SimulateTenderly)
+			simulator := NewSimulate("", tt.account, tt.project, tt.token, tt.tps).SimulateGetter(SimulateTenderly)
 			switch tt.action {
 			case actionAddProject:
 				tt.testAddProject(simulator)
